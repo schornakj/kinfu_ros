@@ -1,3 +1,22 @@
+Project Goals:
+- Create a 3D model of an object using a depth camera
+- Make the model available to other software for next-best-view analysis, robot path planning, etc.
+- Have the capability to capture objects with challenging surface characteristics, especially black surfaces and surfaces with specular properties.
+
+Desired Capabilities:
+- Generate a mesh from TSDF data.
+- Have a ROS-accessible service output meshes when requested.
+- Have option to use pose hints or force a specified pose during ICP localization step. Source pose hints through TF from robot arm kinematics.
+
+Ongoing Questions:
+- What model format is best for robot planning? Is a monolithic mesh for an entire scene better than several component meshes?
+- What is the scope of objects that we should expect to successfully model? Very small objects won't capture well due to the resolution of the Xtion, while large objects will require bigger voxels to capture in a single volume, which would reduce the resolution.
+- What steps can be taken to improve the ability to capture dark and specular surfaces? Consider both programmatic approaches and physical changes to the sensor and the environment.
+- What should be an upper bound on surface difficulty? For example, I would not expect the Xtion to be able to capture a mirror-finish surface.
+
+
+-----8<------Original Content from Personal Robotics repo------8<--------
+
 KinFu ros
 =========
 This is a ROS-generic version of  [kinfu_remake](https://github.com/Nerei/kinfu_remake). It aims to make the package usable without any reference to `OpenNI`, with no assumptions about the kind of depth sensor used. It also aims to make data from the `kinfu` pipeline available via ROS service calls and messages.
