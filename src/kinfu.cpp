@@ -61,6 +61,7 @@ kfusion::KinFu::KinFu(const KinFuParams& params) :
     volume_->setRaycastStepFactor(params_.raycast_step_factor);
     volume_->setGradientDeltaFactor(params_.gradient_delta_factor);
 
+     // TODO: Modify ICP to optionally use TF pose as hit for camera pose calculation.
     icp_ = cv::Ptr<cuda::ProjectiveICP>(new cuda::ProjectiveICP());
     icp_->setDistThreshold(params_.icp_dist_thres);
     icp_->setAngleThreshold(params_.icp_angle_thres);
