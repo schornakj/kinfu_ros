@@ -11,6 +11,7 @@ using namespace kfusion;
 
 int main(int argc, char* argv[])
 {
+    ROS_INFO("starting kinfu node...");
     int device = 0;
     cuda::setDevice(device);
     cuda::printShortCudaDeviceInfo(device);

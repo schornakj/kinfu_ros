@@ -15,6 +15,7 @@ namespace kfusion
     {
         raycastImgPublisher_ = camera->nodeHandle.advertise<sensor_msgs::Image>("raycast_image", 10);
         get_tsdf_server_ = camera->nodeHandle.advertiseService("get_tsdf", &KinFuServer::GetTSDF,  this);
+        //get_mesh_server_ = camera->nodeHandle.advertiseService("get_mesh", &KinFuServer::GetMesh, this);
     }
 
     void KinFuServer::PublishRaycastImage()
@@ -91,7 +92,6 @@ namespace kfusion
             cameraConnected = camera_->hasNewDepth;
             ros::spinOnce();
             connectionHz.sleep();
-
             if (printTimer.hasPending())
             {
                 ROS_INFO("No devices connected yet...\n");
@@ -189,4 +189,55 @@ namespace kfusion
         return true;
     }
 
+    /*
+    bool KinFuServer::GetMesh(kinfu_ros::GetMeshRequest& req, kinfu_ros::GetMeshResponse& res)
+    {
+      ROS_INFO("Hit service callback");
+      //const kfusion::cuda::TsdfVolume& volume = kinfu_->tsdf();
+
+      // pcl::cuda is deprecated. Not sure if casting to pcl::gpu will work but it's worth a shot!
+      //const pcl::gpu::TsdfVolume& volume = (pcl::gpu::TsdfVolume&)(kinfu_->tsdf());
+      const kfusion::cuda::TsdfVolume& volume = kinfu_->tsdf();
+      ROS_INFO("Loaded TSDF volume");
+
+      int dim_x = volume.getDims().val[0];
+      int dim_y = volume.getDims().val[1];
+      int dim_z = volume.getDims().val[2];
+      ROS_INFO("Got existing volume dimensions");
+
+      const Eigen::Vector3i resolution(dim_x, dim_y, dim_z);
+      ROS_INFO("Created resolution vector");
+
+      const pcl::gpu::TsdfVolume volume_temp(resolution);
+      const pcl::gpu::TsdfVolume& pcl_volume = volume_temp;
+      ROS_INFO("Made a pcl tsdf volume");
+
+      // Want to intiialize triangles_buffer to be empty so MarchingCubes uses its default buffer.
+      pcl::gpu::DeviceArray<pcl::PointXYZ> triangles_buffer;
+      ROS_INFO("Initialized triangles buffer");
+      pcl::gpu::DeviceArray<pcl::PointXYZ>& buffer = triangles_buffer;
+      ROS_INFO("Setup buffer reference");
+
+      // Run marching cubes on the provided TSDF volume, with results output to the buffer.
+      // Throws some errors right now.
+      //run(const TsdfVolume& tsdf, DeviceArray<PointType>& triangles_buffer);
+
+      pcl::gpu::MarchingCubes cubes;
+      ROS_INFO("Initialized marching cubes");
+
+      //cubes.run(pcl_volume, buffer);
+      //ROS_INFO("Ran marching cubes on pcl tsdf volume");
+
+      cubes.run((pcl::gpu::TsdfVolume&)volume, buffer);
+      ROS_INFO("Ran marching cubes on kinfu tsdf volume");
+
+      res.value = true;
+      ROS_INFO("Done with service!");
+      return true;
+    }
+    */
+
+
 } /* namespace kfusion */
+
+

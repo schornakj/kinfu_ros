@@ -15,10 +15,24 @@
 #include <sensor_msgs/Image.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
+
 #include <kinfu_ros/GetTSDF.h>
 #include <kinfu_ros/TSDF.h>
 #include <kinfu_ros/GetTSDFRequest.h>
 #include <kinfu_ros/GetTSDFResponse.h>
+
+/*
+#include <kinfu_ros/GetMesh.h>
+#include <kinfu_ros/GetMeshRequest.h>
+#include <kinfu_ros/GetMeshResponse.h>
+*/
+
+#include <pcl/point_types.h>
+#include <pcl/gpu/kinfu/marching_cubes.h>
+#include <pcl/gpu/kinfu/tsdf_volume.h>
+
+//#include <marching_cubes.h>
+
 namespace kfusion
 {
     
@@ -81,6 +95,7 @@ namespace kfusion
 
              // Service calls
              bool GetTSDF(kinfu_ros::GetTSDFRequest& req, kinfu_ros::GetTSDFResponse& res);
+             //bool GetMesh(kinfu_ros::GetMeshRequest& req, kinfu_ros::GetMeshResponse& res);
 
         protected:
             bool should_exit_;
@@ -96,6 +111,7 @@ namespace kfusion
             cv::Mat lastDepth_;
             cv::Mat lastColor_;
             ros::ServiceServer get_tsdf_server_;
+            //ros::ServiceServer get_mesh_server_;
     };
 
 } /* namespace kfusion */

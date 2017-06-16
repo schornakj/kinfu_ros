@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(kinfu_ros)
+add_definitions(-std=c++11)
 
 #compute flags macros
 MACRO(CUDA_COMPUTE_TARGET_FLAGS arch_bin arch_ptx cuda_nvcc_target_flags)
@@ -45,7 +46,7 @@ message(STATUS "CMAKE MODULE PATH IS ${CMAKE_MODULE_PATH}")
 #include(cmake/Targets.cmake)
 
 ## System dependencies are found with CMake's conventions
-find_package(OpenCV 2.4.9 REQUIRED COMPONENTS core highgui)
+find_package(OpenCV REQUIRED COMPONENTS core highgui)
 message(STATUS "Found OpenCV At ${OpenCV_INCLUDE_DIRS}")
 
 find_package(CUDA REQUIRED)
@@ -67,6 +68,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   tf
+  pcl_ros
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -108,6 +110,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_service_files(
    FILES
    GetTSDF.srv
+   GetMesh.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -135,7 +138,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES kinfu_ros
-  CATKIN_DEPENDS cv_bridge image_transport rosconsole roscpp sensor_msgs
+  CATKIN_DEPENDS cv_bridge image_transport rosconsole roscpp sensor_msgs pcl_ros
 )
 
 ###########
@@ -180,6 +183,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 ## Declare a cpp executable
 add_executable(kinfu_node src/kinfu_node.cpp)
+add_executable(meshing_node src/meshing_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -188,9 +192,17 @@ add_executable(kinfu_node src/kinfu_node.cpp)
 ## Specify libraries to link a library or executable target against
  target_link_libraries(kinfu_node
    kinfu_ros
+
    ${catkin_LIBRARIES}
    ${CUDA_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${OpenCV_LIBS}
  )
+
+target_link_libraries(meshing_node
+  kinfu_ros
+
+  ${catkin_LIBRARIES}
+  ${CUDA_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${OpenCV_LIBS}
+)
 
 #############
 ## Install ##
