@@ -34,6 +34,8 @@ using namespace kfusion;
 
 using half_float::half;
 
+//typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+
 class GenerateMesh
 {
 public:
@@ -41,6 +43,7 @@ public:
   {
     tsdf_client_ = nh.serviceClient<kinfu_ros::GetTSDF>("/kinfu/get_tsdf");
     mesh_server_ = nh.advertiseService("get_mesh", &GenerateMesh::GetMesh, this);
+    point_cloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("tsdf_cloud", 1);
 
   }
 
@@ -87,6 +90,14 @@ public:
 
 
     ROS_INFO("Saved point cloud");
+
+
+    ROS_INFO("Updated point cloud publisher");
+    sensor_msgs::PointCloud2 cloud_msg;
+    pcl::toROSMsg(cloud, cloud_msg);
+    std::string frame_id = "camera_depth_optical_frame";
+    cloud_msg.header.frame_id = cloud_msg.header.frame_id.empty() ? frame_id : cloud_msg.header.frame_id;
+    point_cloud_publisher_.publish(cloud_msg);
 
 //    pcl_visualization::CloudViewer viewer("Simple Cloud Viewer");
 //    viewer.showCloud(cloud);
@@ -161,11 +172,11 @@ public:
       for (int j = 0; j < res_y; j++) {
         for (int k = 0; k < res_z; k++) {
           int currentData = data[res_y*res_z*k + res_y*j + i];
-          if (currentData != 0) {
-            half currentValue;
-            int currentWeight;
+          half currentValue;
+          int currentWeight;
 
-            GetTSDFData(currentData, currentValue, currentWeight);
+          GetTSDFData(currentData, currentValue, currentWeight);
+          if (currentWeight > 40 && currentValue < 0.1 && currentValue > -0.1) {
             //ROS_INFO_STREAM("Found an occupied voxel at (" << i << ", " << j << ", " << k << ")");
 
             pcl::PointXYZ currentPoint((float)i*voxel_dim_x, (float)j*voxel_dim_y, (float)k*voxel_dim_z);
@@ -186,6 +197,7 @@ public:
 private:
   ros::ServiceClient tsdf_client_;
   ros::ServiceServer mesh_server_;
+  ros::Publisher point_cloud_publisher_;
 
 };
 
@@ -199,24 +211,26 @@ int main(int argc, char* argv[])
     GenerateMesh app(nh);
     //app.GetMesh();
 
-    //ros::spin();
-    ros::AsyncSpinner spinner(2);
-    spinner.start();
+    ros::spin();
+//    ros::AsyncSpinner spinner(2);
+//    spinner.start();
 
-    ros::Publisher point_cloud_publisher_;
-    point_cloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("tsdf_cloud", 1);
+//    ros::Publisher point_cloud_publisher_;
+//    point_cloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("tsdf_cloud", 1);
 
-    sensor_msgs::PointCloud2 cloud_msg;
-    pcl::toROSMsg(app.cloud, cloud_msg);
-    std::string frame_id = "world_frame";
-    cloud_msg.header.frame_id = cloud_msg.header.frame_id.empty() ? frame_id : cloud_msg.header.frame_id;
+//    ROS_INFO("Publishing point cloud...");
 
-    ROS_INFO("Publishing point cloud...");
-    while(ros::ok()) {
-      point_cloud_publisher_.publish(cloud_msg);
-    }
+//    //ROS_INFO_STREAM("Cloud data " << cloud_msg.data);
+//    while(ros::ok()) {
+//      sensor_msgs::PointCloud2 cloud_msg;
+//      pcl::toROSMsg(app.cloud, cloud_msg);
 
-    ros::waitForShutdown();
+//      std::string frame_id = "camera_depth_optical_frame";
+//      cloud_msg.header.frame_id = cloud_msg.header.frame_id.empty() ? frame_id : cloud_msg.header.frame_id;
+//      point_cloud_publisher_.publish(cloud_msg);
+//    }
+
+//    ros::waitForShutdown();
 
     return 0;
 }
