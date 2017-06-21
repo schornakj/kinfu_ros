@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
+
 project(kinfu_ros)
 add_definitions(-std=c++11)
 
@@ -49,6 +50,10 @@ message(STATUS "CMAKE MODULE PATH IS ${CMAKE_MODULE_PATH}")
 find_package(OpenCV REQUIRED COMPONENTS core highgui)
 message(STATUS "Found OpenCV At ${OpenCV_INCLUDE_DIRS}")
 
+find_library(OPENVDB_LIBRARY NAMES openvdb)
+find_library(TBB_LIBRARY NAMES tbb)
+find_library(HALF_LIBRARY NAMES Half)
+
 find_package(CUDA REQUIRED)
 if(${CUDA_VERSION_STRING} VERSION_GREATER "4.1")
         set(CUDA_ARCH_BIN "2.0 2.1(2.0) 3.0 5.0 5.2" CACHE STRING "Specify 'real' GPU architectures to build binaries for, BIN(PTX) format is supported")
@@ -69,6 +74,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   tf
   pcl_ros
+  visualization_msgs
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -124,6 +130,7 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    geometry_msgs
+   visualization_msgs
  )
 
 ###################################
@@ -138,7 +145,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES kinfu_ros
-  CATKIN_DEPENDS cv_bridge image_transport rosconsole roscpp sensor_msgs pcl_ros
+  CATKIN_DEPENDS cv_bridge image_transport rosconsole roscpp sensor_msgs pcl_ros visualization_msgs
 )
 
 ###########
@@ -178,7 +185,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
  target_link_libraries(kinfu_ros
    ${catkin_LIBRARIES}
-   ${CUDA_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${OpenCV_LIBS}
+   ${CUDA_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${OpenCV_LIBS} openvdb Half tbb
  )
 
 ## Declare a cpp executable
@@ -192,6 +199,7 @@ add_executable(meshing_node src/meshing_node.cpp)
 ## Specify libraries to link a library or executable target against
  target_link_libraries(kinfu_node
    kinfu_ros
+
 
    ${catkin_LIBRARIES}
    ${CUDA_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${OpenCV_LIBS}
