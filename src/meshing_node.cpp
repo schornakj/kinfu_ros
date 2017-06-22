@@ -38,6 +38,7 @@
 #include <openvdb/tools/VolumeToMesh.h>
 #include <openvdb/tools/LevelSetUtil.h>
 #include <openvdb/tools/MeshToVolume.h>
+#include <openvdb/tools/LevelSetSphere.h>
 #include <openvdb/util/Util.h>
 
 //#include <pcl_visualization/cloud_viewer.h>
@@ -97,6 +98,8 @@ public:
     //GenerateMesh::MakePointCloud(cloud, tsdf_data, size_x, size_y, size_z, num_voxels_x, num_voxels_y, num_voxels_z);
     ROS_INFO("Building voxel volume from serialized data...");
     GenerateMesh::MakeVoxelGrid(grid, tsdf_data, size_x, size_y, size_z, num_voxels_x, num_voxels_y, num_voxels_z);
+    //ROS_INFO("Making an example sphere...");
+    //GenerateMesh::MakeSphereVoxelGrid(grid);
     ROS_INFO("Done building volume");
     //ROS_INFO("Finished reading point cloud from TSDF");
     // Max cloud size at 512^3 is 134,217,728
@@ -272,9 +275,9 @@ public:
 
 
 
-//    bool MakeSphereVoxelGrid(openvdb::FloatGrid::Ptr& grid) {
-//      grid = openvdb::FloatGrid::createLevelSetSphere(1);
-//    }
+    bool MakeSphereVoxelGrid(openvdb::FloatGrid::Ptr& grid) {
+      grid = openvdb::tools::createLevelSetSphere<openvdb::FloatGrid>(1.0, openvdb::Vec3f(0,0,0), /*voxel size=*/0.5, /*width=*/4.0);
+    }
 
     //pcl::PointCloud<pcl::PointXYZ> cloud;
     openvdb::FloatGrid::Ptr grid;
@@ -300,12 +303,12 @@ private:
 
       for( size_t ndx = 0; ndx < (*polys)[i].numTriangles(); ndx++ ){
         openvdb::Vec3I *p = &((*polys)[i].triangle(ndx));
-        file << "f " << p->x() << " " << p->y() << " " << p->z() << std::endl;
+        file << "f " << p->x()+1 << " " << p->y()+1 << " " << p->z()+1 << std::endl;
       }
 
       for( size_t ndx = 0; ndx < (*polys)[i].numQuads(); ndx++ ){
         openvdb::Vec4I *p = &((*polys)[i].quad(ndx));
-        file << "f " << p->x() << " " << p->y() << " " << p->z() << " " << p->w() << std::endl;
+        file << "f " << p->x()+1 << " " << p->y()+1 << " " << p->z()+1 << " " << p->w()+1 << std::endl;
       }
     }
 
