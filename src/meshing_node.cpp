@@ -60,7 +60,7 @@ public:
 
     vis_pub_ = nh.advertise<visualization_msgs::Marker>( "visualization_marker", 0 );
 
-    grid = openvdb::FloatGrid::create(/*background value=*/0.0);
+    grid = openvdb::FloatGrid::create(/*background value=*/1.0);
 
   }
 
@@ -98,8 +98,8 @@ public:
     //GenerateMesh::MakePointCloud(cloud, tsdf_data, size_x, size_y, size_z, num_voxels_x, num_voxels_y, num_voxels_z);
     ROS_INFO("Building voxel volume from serialized data...");
     GenerateMesh::MakeVoxelGrid(grid, tsdf_data, size_x, size_y, size_z, num_voxels_x, num_voxels_y, num_voxels_z);
-    //ROS_INFO("Making an example sphere...");
-    //GenerateMesh::MakeSphereVoxelGrid(grid);
+//    ROS_INFO("Making an example sphere...");
+//    GenerateMesh::MakeSphereVoxelGrid(grid);
     ROS_INFO("Done building volume");
     //ROS_INFO("Finished reading point cloud from TSDF");
     // Max cloud size at 512^3 is 134,217,728
@@ -158,8 +158,8 @@ public:
 
 
 
-  bool GetTSDFData(unsigned int input,  half_float::half& voxelValue, int16_t& voxelWeight) {
-//    std::bitset<32> inputBits(input);
+  bool GetTSDFData(unsigned int input,  half_float::half& voxelValue, uint16_t& voxelWeight) {
+    std::bitset<32> inputBits(input);
 
 //    std::bitset<16> valueBits;;
 //    valueBits[0] = inputBits[0];
@@ -203,7 +203,7 @@ public:
     std::memcpy(&voxelValue, &input, 2);
     std::memcpy(&voxelWeight, &input + 1, 2);
 
-//    ROS_INFO_STREAM("Voxel bits: value:" << valueBits << " weight:" <<weightBits);
+//    ROS_INFO_STREAM("Voxel bits: " << inputBits);
 //    ROS_INFO_STREAM("Voxel ints: value:" << voxelValue << " weight:" <<voxelWeight);
     return true;
   }
@@ -261,10 +261,11 @@ public:
           half_float::half currentValue;
           //float currentValue;
 
-          int16_t currentWeight;
+          uint16_t currentWeight;
 
           GetTSDFData(currentData, currentValue, currentWeight);
           ValueT val = ValueT(currentValue);
+//          ROS_INFO_STREAM("Current weight: " << currentWeight);
           accessor.setValue(ijk, val);
           }
         }

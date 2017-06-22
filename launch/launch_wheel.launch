@@ -52,25 +52,25 @@
 
             # Distance away from surface (in meters) the TSDF will be computed
             # Higher values result in smoother reconstructions, but less sharp
-            # corners and edges. Lower values result in more accurate 
+            # corners and edges. Lower values result in more accurate
             # reconstructions, but too low and noise becomes a major issue.
-            tsdf_trunc_dist: 0.04
+            tsdf_trunc_dist: 0.03
 
             # The size of the TSDF volume in voxels
-            volume_dims_x: 512
-            volume_dims_y: 512
-            volume_dims_z: 512
+            volume_dims_x: 640
+            volume_dims_y: 640
+            volume_dims_z: 640
 
-            # The size of the TSDF volume in meters. The size of a voxel is 
+            # The size of the TSDF volume in meters. The size of a voxel is
             # volume_size / volume_dims
-            volume_size_x: 3
-            volume_size_y: 3
-            volume_size_z: 3
+            volume_size_x: 1.5
+            volume_size_y: 1.5
+            volume_size_z: 1.5
 
             # The position of the topmost corner of the TSDF volume in meters
-            volume_pos_x: -1.5
-            volume_pos_y: -1.5
-            volume_pos_z: 0.5
+            volume_pos_x: 0
+            volume_pos_y: 0
+            volume_pos_z: 0
         </rosparam>
     </node>
 
