@@ -1,9 +1,9 @@
 Basic Operating Instructions:
 1. In one terminal window, run "roslaunch kinfu_ros launch_default_2.launch". This will start a kinfu_ros server node and an OpenVDB meshing node. The most imporant parameters defined in the launch file are the names of the sensor topics and the size of the TSDF volume (both in voxels and meters).
-2a. In a second window: If using an Xtion, run "roslaunch openni2_launch openni2.launch" to start the sensor and begin publishing its outputs. Another option is to run "roslaunch kinfu_ros start_data_record.launch" to save the sensor datastream to a rosbag.
-2b. Alternatively, if using a rosbag of a recorded Xtion datastream without an actual Xtion, run "rosbag play path/to/file.bag".
-3. To export the TSDF and generate a mesh, run "rosservice call /get_mesh" in a third window. The write path is currently hardcoded in meshing_node.cpp at line 117 (sorry Austin!) but if building from source it can be changed.
-4. The resulting mesh will probably have its normals inverted, but this can be fixed in Meshlab using the invert normals filter.
+2. In a second window: If using an Xtion, run "roslaunch openni2_launch openni2.launch" to start the sensor and begin publishing its outputs. Another option is to run "roslaunch kinfu_ros start_data_record.launch" to save the sensor datastream to a rosbag.
+3. Alternatively, if using a rosbag of a recorded Xtion datastream without an actual Xtion, run "rosbag play path/to/file.bag".
+4. To export the TSDF and generate a mesh, run "rosservice call /get_mesh" in a third window. The write path is currently hardcoded in meshing_node.cpp at line 117 (sorry Austin!) but if building from source it can be changed.
+5. The resulting mesh will probably have its normals inverted, but this can be fixed in Meshlab using the invert normals filter.
 
 Project Goals:
 - Create a 3D model of an object using a depth camera
