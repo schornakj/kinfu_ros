@@ -78,7 +78,7 @@ public:
     ROS_INFO("Got TSDF");
     res.value = true;
 
-    //TODO: Change TSDF to point cloud, do marching cubes, add mesh to service response.
+    //TODO: Add mesh to service response.
 
     int size_x = srv.response.tsdf.size_x;
     int size_y = srv.response.tsdf.size_y;
@@ -159,54 +159,8 @@ public:
 
 
   bool GetTSDFData(unsigned int input,  half_float::half& voxelValue, uint16_t& voxelWeight) {
-    std::bitset<32> inputBits(input);
-
-//    std::bitset<16> valueBits;;
-//    valueBits[0] = inputBits[0];
-//    valueBits[1] = inputBits[1];
-//    valueBits[2] = inputBits[2];
-//    valueBits[3] = inputBits[3];
-//    valueBits[4] = inputBits[4];
-//    valueBits[5] = inputBits[5];
-//    valueBits[6] = inputBits[6];
-//    valueBits[7] = inputBits[7];
-//    valueBits[8] = inputBits[8];
-//    valueBits[9] = inputBits[9];
-//    valueBits[10] = inputBits[10];
-//    valueBits[11] = inputBits[11];
-//    valueBits[12] = inputBits[12];
-//    valueBits[13] = inputBits[13];
-//    valueBits[14] = inputBits[14];
-//    valueBits[15] = inputBits[15];
-
-//    std::bitset<16> weightBits;
-//    weightBits[0] = inputBits[16];
-//    weightBits[1] = inputBits[17];
-//    weightBits[2] = inputBits[18];
-//    weightBits[3] = inputBits[19];
-//    weightBits[4] = inputBits[20];
-//    weightBits[5] = inputBits[21];
-//    weightBits[6] = inputBits[22];
-//    weightBits[7] = inputBits[23];
-//    weightBits[8] = inputBits[24];
-//    weightBits[9] = inputBits[25];
-//    weightBits[10] = inputBits[26];
-//    weightBits[11] = inputBits[27];
-//    weightBits[12] = inputBits[28];
-//    weightBits[13] = inputBits[29];
-//    weightBits[14] = inputBits[30];
-//    weightBits[15] = inputBits[31];
-
-    //voxelValue = reinterpret_cast<half>(valueBits.to_ulong());
-//    voxelWeight = (int)weightBits.to_ulong();
-
     std::memcpy(&voxelValue, &input, 2);
     std::memcpy(&voxelWeight, ((char*)(&input)) + 2, 2);
-
-//    if (voxelWeight > 0) {
-//      ROS_INFO_STREAM("Voxel bits: " << inputBits);
-//      ROS_INFO_STREAM("Voxel ints: value:" << voxelValue << " weight:" <<voxelWeight);
-//    }
     return true;
   }
 
@@ -328,95 +282,16 @@ private:
 
 };
 
-/*
-// Populate the given grid with a narrow-band level set representation of a sphere.
-// The width of the narrow band is determined by the grid's background value.
-// (Example code only; use tools::createSphereSDF() in production.)
-template<class GridType>
-void setTSDFGridValue(GridType& grid, const float& distance, int voxelCoordX, int voxelCoordY, int voxelCoordZ)
-{
-    typedef typename GridType::ValueType ValueT;
-    // Distance value for the constant region exterior to the narrow band
-    //const ValueT outside = grid.background();
-    // Distance value for the constant region interior to the narrow band
-    // (by convention, the signed distance is negative in the interior of
-    // a level set)
-    //const ValueT inside = -outside;
-    // Use the background value as the width in voxels of the narrow band.
-    // (The narrow band is centered on the surface of the sphere, which
-    // has distance 0.)
-    //int padding = int(openvdb::math::RoundUp(openvdb::math::Abs(outside)));
-    // The bounding box of the narrow band is 2*dim voxels on a side.
-    //int dim = int(radius + padding);
-    // Get a voxel accessor.
-    typename GridType::Accessor accessor = grid.getAccessor();
-    // Compute the signed distance from the surface of the sphere of each
-    // voxel within the bounding box and insert the value into the grid
-    // if it is smaller in magnitude than the background value.
-    openvdb::Coord ijk;
-    int &i = ijk[0], &j = ijk[1], &k = ijk[2];
-
-    i = voxelCoordX;
-    j = voxelCoordY;
-    k = voxelCoordZ;
-    ValueT val = ValueT(distance);
-    accessor.setValue(ijk, val);
-
-
-//    for (i = 0; i < voxels_x; ++i) {
-//        const float x2 = openvdb::math::Pow2(i - c[0]);
-//        for (j = 0; j < voxels_y; ++j) {
-//            //const float x2y2 = openvdb::math::Pow2(j - c[1]) + x2;
-//            for (k = 0; k < voxels_z; ++k) {
-//                // The distance from the sphere surface in voxels
-//                const float dist = openvdb::math::Sqrt(x2y2 + openvdb::math::Pow2(k - c[2])) - radius;
-//                // Convert the floating-point distance to the grid's value type.
-//                ValueT val = ValueT(dist);
-//                // Only insert distances that are smaller in magnitude than
-//                // the background value.
-//                //if (val < inside || outside < val) continue;
-//                // Set the distance for voxel (i,j,k).
-//                accessor.setValue(ijk, val);
-//            }
-//        }
-//    }
-
-    // Propagate the outside/inside sign information from the narrow band
-    // throughout the grid.
-    //openvdb::tools::signedFloodFill(grid.tree());
-}
-*/
 
 int main(int argc, char* argv[])
 {
     openvdb::initialize();
     ros::init(argc, argv, "meshing_node");
-    //ros::NodeHandle node("~");
     ros::NodeHandle nh;
 
     GenerateMesh app(nh);
-    //app.GetMesh();
 
     ros::spin();
-//    ros::AsyncSpinner spinner(2);
-//    spinner.start();
-
-//    ros::Publisher point_cloud_publisher_;
-//    point_cloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("tsdf_cloud", 1);
-
-//    ROS_INFO("Publishing point cloud...");
-
-//    //ROS_INFO_STREAM("Cloud data " << cloud_msg.data);
-//    while(ros::ok()) {
-//      sensor_msgs::PointCloud2 cloud_msg;
-//      pcl::toROSMsg(app.cloud, cloud_msg);
-
-//      std::string frame_id = "camera_depth_optical_frame";
-//      cloud_msg.header.frame_id = cloud_msg.header.frame_id.empty() ? frame_id : cloud_msg.header.frame_id;
-//      point_cloud_publisher_.publish(cloud_msg);
-//    }
-
-//    ros::waitForShutdown();
 
     return 0;
 }

@@ -185,9 +185,56 @@ namespace kfusion
         res.tsdf.pose.orientation.z = tfQuat.z();
         res.tsdf.pose.orientation.w = tfQuat.w();
         res.tsdf.data.resize(res.tsdf.num_voxels_x * res.tsdf.num_voxels_y * res.tsdf.num_voxels_z, 0);
+        ROS_INFO("About to download TSDF data...");
+        //uint32_t dataTemp[res.tsdf.num_voxels_x * res.tsdf.num_voxels_y * res.tsdf.num_voxels_z];
+        //volume.data().download(dataTemp);
+
+        // res.tsdf.data is a vector<uint32>. Need to figure out how to assign a vector to it en masse.
+        //res.tsdf.data.assign(dataTemp);
         volume.data().download(res.tsdf.data.data());
+        ROS_INFO("Just downloaded TSDF data");
+        // Problem is after this point. Looks like data downloads OK, but when message is sent during callback ROS stops it.
         return true;
     }
+
+//    bool KinFuServer::TruncateTSDF(std::vector<uint32_t> &input)
+//    {
+//      uint32_t emptyCounter = 0;
+//      uint16_t lastWeight = 0;
+//      for (int i = 0; i < input.size(); i++) {
+//        half_float::half value;
+//        uint16_t weight;
+//        KinFuServer::GetTSDFData(input[i], value, weight);
+//        if (weight == 0) {
+//          // current weight is 0 and last weight was 0 -> no change
+//          if (lastWeight == 0) {
+//            emptyCounter++;
+//          }
+//          // otherwise, just left an area of measurement
+//        } else {
+//          // current weight isn't 0 but last weight was 0 -> hit an area of measurement, reset counter
+//          if (lastWeight == 0) {
+//            emptyCounter = 0;
+//          }
+//          // current weight isn't 0 and last weight isn't 0 -> still in an area of measurement
+//          // either way, need to serialize current voxel with actual TSDF data
+//        }
+//      }
+
+//      return true;
+//    }
+
+//    bool GetTSDFData(uint32_t input,  half_float::half& voxelValue, uint16_t& voxelWeight) {
+//      std::memcpy(&voxelValue, &input, 2);
+//      std::memcpy(&voxelWeight, ((char*)(&input)) + 2, 2);
+//      return true;
+//    }
+
+//    bool MakeSDFData(uint32_t& output,  half_float::half voxelValue, uint16_t voxelWeight) {
+//      std::memcpy(((char*)(&output)), voxelValue, 2);
+//      std::memcpy(((char*)(&output)) + 2, voxelWeight, 2);
+//      return true;
+//    }
 
     /*
     bool KinFuServer::GetMesh(kinfu_ros::GetMeshRequest& req, kinfu_ros::GetMeshResponse& res)

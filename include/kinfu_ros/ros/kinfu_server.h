@@ -31,6 +31,8 @@
 #include <pcl/gpu/kinfu/marching_cubes.h>
 #include <pcl/gpu/kinfu/tsdf_volume.h>
 
+#include <ros/half.hpp>
+
 //#include <marching_cubes.h>
 
 namespace kfusion
@@ -96,6 +98,10 @@ namespace kfusion
              // Service calls
              bool GetTSDF(kinfu_ros::GetTSDFRequest& req, kinfu_ros::GetTSDFResponse& res);
              //bool GetMesh(kinfu_ros::GetMeshRequest& req, kinfu_ros::GetMeshResponse& res);
+
+//             bool TruncateTSDF(std::vector<uint32_t> &input);
+
+//             bool GetTSDFData(uint32_t input,  half_float::half& voxelValue, uint16_t& voxelWeight);
 
         protected:
             bool should_exit_;
