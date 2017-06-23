@@ -201,10 +201,12 @@ public:
 //    voxelWeight = (int)weightBits.to_ulong();
 
     std::memcpy(&voxelValue, &input, 2);
-    std::memcpy(&voxelWeight, &input + 1, 2);
+    std::memcpy(&voxelWeight, ((char*)(&input)) + 2, 2);
 
-//    ROS_INFO_STREAM("Voxel bits: " << inputBits);
-//    ROS_INFO_STREAM("Voxel ints: value:" << voxelValue << " weight:" <<voxelWeight);
+//    if (voxelWeight > 0) {
+//      ROS_INFO_STREAM("Voxel bits: " << inputBits);
+//      ROS_INFO_STREAM("Voxel ints: value:" << voxelValue << " weight:" <<voxelWeight);
+//    }
     return true;
   }
 
@@ -266,7 +268,9 @@ public:
           GetTSDFData(currentData, currentValue, currentWeight);
           ValueT val = ValueT(currentValue);
 //          ROS_INFO_STREAM("Current weight: " << currentWeight);
-          accessor.setValue(ijk, val);
+          if (currentWeight > 0) {
+            accessor.setValue(ijk, val);
+          }
           }
         }
       }
